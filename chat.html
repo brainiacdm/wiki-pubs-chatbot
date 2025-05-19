@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Talk to Hops the WikiPubs Bot 🦘🍺</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+    }
+    #chat {
+      height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: #fff;
+    }
+    .user { color: blue; font-weight: bold; }
+    .bot { color: green; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <h2>Talk to Hops the WikiPubs Bot 🦘🍺</h2>
+  <div id="chat"></div>
+  <input type="text" id="userInput" placeholder="Ask about pub trails, vanlife, etc." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chatBox = document.getElementById("chat");
+      const userMessage = input.value.trim();
+
+      if (!userMessage) return;
+
+      const userDiv = document.createElement("div");
+      userDiv.className = "user";
+      userDiv.innerText = `You: ${userMessage}`;
+      chatBox.appendChild(userDiv);
+      input.value = "";
+
+      try {
+        const response = await fetch("https://wiki-pubs-chatbot.onrender.com/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: userMessage })
+        });
+
+        const data = await response.json();
+        const botDiv = document.createElement("div");
+        botDiv.className = "bot";
+        botDiv.innerText = `Hops: ${data.response || "No response"}`;
+        chatBox.appendChild(botDiv);
+      } catch (error) {
+        const errorDiv = document.createElement("div");
+        errorDiv.className = "bot";
+        errorDiv.innerText = "⚠️ Hops hit a snag!";
+        chatBox.appendChild(errorDiv);
+        console.error(error);
+      }
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>
